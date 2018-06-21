@@ -4,8 +4,11 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Scanner;
 
 public class Main {
+
+
 
     //Main method for the program
     public static void main (String[] args){
@@ -49,11 +52,62 @@ public class Main {
             }
         }
 
-        for(int i = 0; i < dataList.size(); i++){
-            System.out.println("Date: " + dataList.get(i).date + " - Weight: " + dataList.get(i).weight);
+        System.out.println("There are " + dataList.size() + " entries in the database");
+
+        //creates an input scanner and begins the programs main flow
+        Scanner inputScanner = new Scanner(System.in);
+        inputFlow(inputScanner);
+
+        //once finished close the scanner
+        inputScanner.close();
+
+
+    }
+
+    //once the program is loaded, input flow will be the main controller for the actions you wish to take
+    private static void inputFlow(Scanner inputScanner){
+        Boolean exit = false;
+        while(exit == false){
+            System.out.println();
+            System.out.println("-------------------------------------");
+            System.out.println("Please select from the following:");
+            System.out.println("1. Display graph");
+            System.out.println("2. Predict date of target weight");
+            System.out.println("3. Add a new weight");
+            System.out.println("4. Exit program");
+            System.out.println("-------------------------------------");
+
+            try {
+                //if a non in input it entered it will throw an exception
+                int input = inputScanner.nextInt();
+
+                switch (input) {
+                    case 1:
+                        System.out.println("1 was selected.  TODO");
+                        break;
+                    case 2:
+                        System.out.println("2 was selected.  TODO");
+                        break;
+                    case 3:
+                        System.out.println("3 was selected.  TODO");
+                        break;
+                    case 4:
+                        System.out.println("Exiting Program");
+                        exit = true;
+                        break;
+                    default:
+                        System.out.println("Please enter a valid input");
+                }
+            }
+            //if an error is thrown it consumes the bad input and continues on with the loop
+            catch(Exception e){
+                inputScanner.next();
+                System.out.println(e);
+                System.out.println("Please enter a valid input");
+            }
+
+
         }
-
-
     }
 
 }
