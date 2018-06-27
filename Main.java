@@ -2,13 +2,14 @@ package WeightTracker;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Scanner;
 
 public class Main {
 
-
+    public static String fileSource = "src\\weightSpreadsheet.csv";
 
     //Main method for the program
     public static void main (String[] args){
@@ -16,8 +17,7 @@ public class Main {
         //This linked list will store each data point
         LinkedList<WeightData> dataList = new LinkedList<WeightData>();
 
-        //source of our file we are reading in as well as initializing the reader
-        String fileSource = "src\\weightSpreadsheet.csv";
+        //initializes the reader
         BufferedReader bufferedReader = null;
 
         //this try block will attempt to read in each line from the given file, break up the line into a date/weight, save those into a new WeightData object, and finally add that object to the linked list
@@ -89,7 +89,7 @@ public class Main {
                         System.out.println("2 was selected.  TODO");
                         break;
                     case 3:
-                        System.out.println("3 was selected.  TODO");
+                        addWeight(inputScanner);
                         break;
                     case 4:
                         System.out.println("Exiting Program");
@@ -108,6 +108,44 @@ public class Main {
 
 
         }
+    }
+
+    //adds a weight to our weight document
+    //TODO: Error check the input and that the newWeight fields are full before writing to file
+    private static void addWeight(Scanner inputScanner){
+        WeightData newWeight = new WeightData();
+        Boolean exit = false;
+        while(exit == false){
+            System.out.println("Please enter the date (m/d/yyyy):");
+            String inputDate = inputScanner.next();
+            newWeight.setDate(inputDate);
+            System.out.println("Please enter the weight");
+            Float inputWeight = inputScanner.nextFloat();
+            newWeight.setWeight(inputWeight);
+
+
+            FileWriter fileWriter = null;
+            try{
+                fileWriter = new FileWriter(fileSource, true);
+                fileWriter.write("\n" + newWeight.getDataAsString());
+            }
+            catch(IOException e){
+                System.out.println(e);
+            }
+            finally {
+                try {
+                    //closes the reader
+                    fileWriter.close();
+                }
+                catch (IOException e){
+                    System.out.println(e);
+                }
+            }
+
+            exit = true;
+        }
+
+
     }
 
 }
