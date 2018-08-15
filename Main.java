@@ -56,7 +56,7 @@ public class Main {
 
         //creates an input scanner and begins the programs main flow
         Scanner inputScanner = new Scanner(System.in);
-        inputFlow(inputScanner);
+        inputFlow(inputScanner, dataList);
 
         //once finished close the scanner
         inputScanner.close();
@@ -65,7 +65,7 @@ public class Main {
     }
 
     //once the program is loaded, input flow will be the main controller for the actions you wish to take
-    private static void inputFlow(Scanner inputScanner){
+    private static void inputFlow(Scanner inputScanner, LinkedList<WeightData> dataList){
         Boolean exit = false;
         while(exit == false){
             System.out.println();
@@ -86,10 +86,10 @@ public class Main {
                         System.out.println("1 was selected.  TODO");
                         break;
                     case 2:
-                        System.out.println("2 was selected.  TODO");
+                        predictWeight(inputScanner, dataList);
                         break;
                     case 3:
-                        addWeight(inputScanner);
+                        addWeight(inputScanner, dataList);
                         break;
                     case 4:
                         System.out.println("Exiting Program");
@@ -110,9 +110,66 @@ public class Main {
         }
     }
 
+
+    //calculates how long it will take to reach goal weight.  To do this is will ask for the range in dates, then find a line that fits over that range and predict the date.
+    public static void predictWeight(Scanner inputScanner, LinkedList<WeightData> dataList){
+        System.out.println("Please enter the start date (m/d/yyyy):");
+        String startDate = inputScanner.next();
+        System.out.println("Please enter the end date (m/d/yyyy):");
+        String endDate = inputScanner.next();
+        System.out.println("Please enter your goal weight:");
+        Float goalWeight = inputScanner.nextFloat();
+
+        //now that we have our range we need to find where in the linked list to start
+        int startIndex = -1;
+        for(int i = 0; i < dataList.size(); i++){
+            if(dataList.get(i).date.equals(startDate)){
+                startIndex = i;
+                break;
+            }
+        }
+        if(startIndex == -1){
+            System.out.println("could not find the start date");
+            return;
+        }
+        //now lets find that end date
+        int endIndex = -1;
+        for(int i = startIndex; i < dataList.size(); i++){
+            if(dataList.get(i).date.equals(endDate)){
+                endIndex = i;
+                break;
+            }
+        }
+        if(endIndex == -1){
+            System.out.println("could not find the end date");
+            return;
+        }
+
+        //now that we have the index of the start and end, lets do some calculations.  Since I currently weigh myself every day, the slope will always be (difference between weight 1 and 2)/1.
+        LinkedList<Float> slopes = new LinkedList<Float>();
+        for(int i = startIndex; i < endIndex -1; i++){
+            Float newSlope = dataList.get(i+1).getWeight() - dataList.get(i).getWeight();
+            slopes.add(newSlope);
+        }
+        //now lets get an average of all of the slopes in the range
+        Float slopesTotal = 0f;
+        for(int i = 0; i < slopes.size(); i++){
+            slopesTotal += slopes.get(i);
+        }
+        Float averageSlope = slopesTotal/slopes.size();
+
+        //Now that we have the slope, lets take the last weight and add the slope until we reach to goal weight
+        int daysToGoalWeight = (int)((goalWeight - dataList.getLast().getWeight())/averageSlope);
+
+        System.out.println("You currently weight: " + dataList.getLast().getWeight());
+        System.out.println("Your goal weight is: " + goalWeight);
+        System.out.println("You gain an average of " + averageSlope + " pounds per day and " + averageSlope*7 + " pounds per week");
+        System.out.println("It will take you " + daysToGoalWeight + " days to reach your goal");
+    }
+
     //adds a weight to our weight document
     //TODO: Error check the input and that the newWeight fields are full before writing to file
-    private static void addWeight(Scanner inputScanner){
+    private static void addWeight(Scanner inputScanner, LinkedList<WeightData> dataList){
         WeightData newWeight = new WeightData();
         Boolean exit = false;
         while(exit == false){
@@ -128,6 +185,7 @@ public class Main {
             try{
                 fileWriter = new FileWriter(fileSource, true);
                 fileWriter.write("\n" + newWeight.getDataAsString());
+                dataList.add(newWeight);
             }
             catch(IOException e){
                 System.out.println(e);
